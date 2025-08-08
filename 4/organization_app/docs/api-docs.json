@@ -1,0 +1,212 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Organization Structure API",
+    "description": "API for managing organization structures and their nodes.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8000/",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/structures": {
+      "get": {
+        "summary": "List Structures",
+        "description": "Retrieves a list of all organization structures belonging to the authenticated user.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of structures and their nodes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "integer" },
+                      "user_id": { "type": "integer" },
+                      "label": { "type": ["string", "integer"] },
+                      "nodes": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": { "type": "integer" },
+                            "structure_id": { "type": "integer" },
+                            "label": { "type": ["string", "integer"] },
+                            "parent_id": { "type": ["integer", "null"] }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Structure",
+        "description": "Creates a new organization structure with its associated nodes in a single authenticated request.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "label": { "type": ["string", "integer"] },
+                  "nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "label": { "type": ["string", "integer"] },
+                        "parent_id": { "type": ["integer", "null"] }
+                      }
+                    }
+                  }
+                },
+                "required": ["label", "nodes"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Structure saved successfully"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/structures/{id}": {
+      "get": {
+        "summary": "Detail Structure",
+        "description": "Retrieves a single organization structure and its nodes by ID.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "The ID of the structure to retrieve."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A single structure and its nodes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer" },
+                    "user_id": { "type": "integer" },
+                    "label": { "type": ["string", "integer"] },
+                    "nodes": { "type": "array" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Structure not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Edit Structure",
+        "description": "Updates an existing organization structure and its nodes by ID.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "The ID of the structure to update."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "label": { "type": ["string", "integer"] },
+                  "nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "label": { "type": ["string", "integer"] },
+                        "parent_id": { "type": ["integer", "null"] }
+                      }
+                    }
+                  }
+                },
+                "required": ["label", "nodes"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Structure updated successfully"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "422": {
+            "description": "Validation error"
+          },
+          "404": {
+            "description": "Structure not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
